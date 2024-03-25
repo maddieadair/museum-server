@@ -5,9 +5,9 @@ const mysql = require("mysql");
 // "proxy": "http://localhost:4000",
 
 const pool = mysql.createPool({
-  host: "cosc3380-museum.mysql.database.azure.com",
-  user: "cosc3380",
-  password: "museumDB3380",
+  host: "mysql-museum.mysql.database.azure.com",
+  user: "admin01",
+  password: "bananafish1!",
   database: "museum",
   port: "3306"
 });
