@@ -11,16 +11,6 @@ const pool = mysql.createPool({
   database: "museum",
 });
 
-pool.getConnection((err, connection) => {
-    if (err) {
-      console.error("Error connecting to database:", err);
-      return;
-    }
-    console.log("Connected to database!");
-    // Release the connection
-    connection.release();
-  });
-
 // const pool = mysql.createPool({
 //     host: process.env.DB_HOST,
 //     user: process.env.USER,
@@ -33,8 +23,13 @@ const server = http.createServer((req, res) => {
     // Handle Cors Function To Allow Axios
     handleCors(req, res);
 
+    if (req.url == "/about"){
+        res.setHeader('Content-Type', 'text/html');
+        res.write('<html><head><title>about page</title></head><body><h1>test!</h1></body></html>');
+        res.end();
+    }
     // GET Requests 
-    if (req.method === "GET") {
+    else if (req.method === "GET") {
         if (req.url === "/") {
             res.setHeader('Content-Type', 'text/html');
             res.write('<html><head><title>Hello, World!</title></head><body><h1>Hello, World!</h1></body></html>');
@@ -42,7 +37,7 @@ const server = http.createServer((req, res) => {
         }
 
         // Get ALl Users
-        else if (req.url === "/api/users") {
+        else if (req.url === "/users") {
             pool.query(
                 "SELECT * FROM users",
                 (error, result) => {
@@ -76,8 +71,8 @@ const handleCors = (req, res) => {
     }
 };
 
-// Set Up Server To Listen For Requests From Port 3001
-const PORT = process.env.PORT || 3001;
+// Set Up Server To Listen For Requests From Port 400
+const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });
