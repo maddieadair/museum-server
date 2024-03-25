@@ -9,7 +9,6 @@ const pool = mysql.createPool({
   user: "admin01",
   password: "bananafish1!",
   database: "museum",
-  dateStrings: true,
 });
 
 pool.getConnection((err, connection) => {
