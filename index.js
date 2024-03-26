@@ -36,7 +36,6 @@ const server = http.createServer((req, res) => {
         res.write('<html><head><title>about page</title></head><body><h1>test!</h1></body></html>');
         res.end();
     }
-    // GET Requests 
     else if (req.method === "GET") {
         if (req.url === "/") {
             res.setHeader('Content-Type', 'text/html');
@@ -44,10 +43,9 @@ const server = http.createServer((req, res) => {
             res.end();
         }
 
-        // Get ALl Users
-        else if (req.url === "/users") {
+        else if (req.url === "/gift-items") {
             pool.query(
-                "SELECT * FROM users",
+                "SELECT * FROM gift-items",
                 (error, result) => {
                     if (error) {
                         res.writeHead(500, { "Content-Type": "application/json" });
@@ -62,7 +60,22 @@ const server = http.createServer((req, res) => {
         // Get All Items From Available
         } 
 
-    // POST Requests
+        else if (req.url === "/users") {
+            pool.query(
+                "SELECT * FROM users",
+                (error, result) => {
+                    if (error) {
+                        res.writeHead(500, { "Content-Type": "application/json" });
+                        res.end(JSON.stringify({ error: error }));
+                    } else {
+                        res.writeHead(200, { "Content-Type": "application/json" });
+                        res.end(JSON.stringify(result));
+                    }
+                }
+            );
+        
+        } 
+
     } 
 });
 
@@ -79,8 +92,8 @@ const handleCors = (req, res) => {
     }
 };
 
-// Set Up Server To Listen For Requests From Port 400
-const PORT = process.env.PORT || 4000;
+// Set Up Server To Listen For Requests From Port 3001
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });
