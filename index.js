@@ -45,7 +45,7 @@ const server = http.createServer((req, res) => {
 
         else if (req.url === "/gift-items") {
             pool.query(
-                "SELECT * FROM gift-items",
+                "SELECT * FROM gifts",
                 (error, result) => {
                     if (error) {
                         res.writeHead(500, { "Content-Type": "application/json" });
