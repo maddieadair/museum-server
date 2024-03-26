@@ -1,6 +1,5 @@
 const http = require("http");
 const { parse } = require("url");
-const pool = require("./config/db.js");
 
 const gifts = require("./routes/gift-items")
 const artworks = require("./routes/artworks")
