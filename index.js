@@ -8,6 +8,7 @@ const pool = mysql.createPool({
   password: "bananafish1!",
   database: "museum",
   port: "3306",
+  timezone : "+00:00"
 });
 
 const server = http.createServer((req, res) => {
@@ -463,7 +464,10 @@ const deleteGiftItem = (req, res) => {
 
   // GET
   const getCurrentThreeExhibitions = (req, res) => {
-    pool.query("SELECT * FROM exhibitions LIMIT 3", (error, results) => {
+    pool.query(`SELECT Exhibit_Name, Curator_ID, Description, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS Opening_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS End_Date FROM exhibitions
+    WHERE (CURDATE() >= Opening_Date AND (CURDATE() <= End_Date OR End_Date IS NOT NULL))
+    ORDER BY Opening_Date ASC
+    LIMIT 3;`, (error, results) => {
         if (error) {
         console.error("Error getting top 3 current exhibtions:", error);
         res.writeHead(500, { "Content-Type": "application/json" });
