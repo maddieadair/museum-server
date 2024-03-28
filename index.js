@@ -48,6 +48,8 @@ const server = http.createServer((req, res) => {
     deleteExhibition(req, res);
   } else if (pathname === "/exhibitions-three" && req.method === "GET") {
     getCurrentThreeExhibitions(req, res);
+} else if (pathname === "/get-exhibition" && req.method === "GET") {
+    getAnExhibition(req, res);
 
   } else if (pathname === "/users" && req.method === "GET") {
     getUsers(req, res);
@@ -108,6 +110,8 @@ const server = http.createServer((req, res) => {
     updateArtwork(req, res);
   } else if (pathname === "/artworks" && req.method === "POST") {
     updateArtwork(req, res);
+} else if (pathname === "/exhibition-art" && req.method === "GET") {
+    getExhibArt(req, res);
 
   } else if (pathname === "/gift-log" && req.method === "GET") {
     getTicketTransactions(req, res);
@@ -496,6 +500,44 @@ const deleteGiftItem = (req, res) => {
       }
     });
   };
+
+    // GET
+    const getAnExhibition = (req, res) => {
+        let body = "";
+      
+        req.on("data", (chunk) => {
+          body += chunk.toString();
+        });
+      
+        req.on("end", () => {
+          try {
+            const data = JSON.parse(body);
+            console.log("POST request body:", data); // Log the request body
+            const { Exhibit_Name } = data;
+            pool.query(
+              "SELECT * FROM exhibitions WHERE Exhibit_Name = ?",
+              [Exhibit_Name],
+              (error, results) => {
+                if (error) {
+                  console.error("Error getting exhibition:", error);
+                  res.writeHead(500, { "Content-Type": "application/json" });
+                  res.end(JSON.stringify({ message: "Internal server error" }));
+                } else {
+                  res.writeHead(200, { "Content-Type": "application/json" });
+                  res.end(JSON.stringify(results));
+                }
+              },
+            );
+          } catch (error) {
+            console.error("Error parsing request body:", error);
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ message: "Invalid request body" }));
+          }
+        });
+      };
+    
+    
+    
 
   // POST
 const addExhibition = (req, res) => {
@@ -1338,6 +1380,43 @@ const getEmployees = (req, res) => {
     });
   };
 
+
+// ------------------------------------------------ ARTWORKS ------------------------------------------------
+
+
+  const getExhibArt = (req, res) => {
+    let body = "";
+
+  req.on("data", (chunk) => {
+    body += chunk.toString();
+  });
+
+  req.on("end", () => {
+    try {
+      const data = JSON.parse(body);
+      console.log("PUT request body:", data); 
+      const { Exhibit_Name } = data;
+      pool.query(
+        "SELECT artworks.Art_ID, artworks.Art_Name FROM artworks LEFT JOIN exhibitions ON artworks.Exhibit_Name = exhibitions.Exhibit_Name WHERE exhibitions.Exhibit_Name=?",
+        [Exhibit_Name],
+        (error, results) => {
+          if (error) {
+            console.error("Error getting exhibition artworks:", error);
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ message: "Internal server error" }));
+          } else {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify(results));
+        }
+        },
+      );
+    } catch (error) {
+      console.error("Error parsing request body:", error);
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: "Invalid request body" }));
+    }
+  });
+};
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
