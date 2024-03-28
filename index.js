@@ -448,7 +448,7 @@ const deleteGiftItem = (req, res) => {
 
   // GET
   const getExhibitions = (req, res) => {
-    pool.query("SELECT * FROM exhibitions", (error, results) => {
+    pool.query(`SELECT Exhibit_Name, Curator_ID, Description, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date FROM exhibitions;`, (error, results) => {
         if (error) {
         console.error("Error getting exhibtions:", error);
         res.writeHead(500, { "Content-Type": "application/json" });
