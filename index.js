@@ -464,7 +464,7 @@ const deleteGiftItem = (req, res) => {
 
   // GET
   const getCurrentThreeExhibitions = (req, res) => {
-    pool.query(`SELECT Exhibit_Name, Curator_ID, Description, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS Opening_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS End_Date FROM exhibitions
+    pool.query(`SELECT Exhibit_Name, Curator_ID, Description, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date FROM exhibitions
     WHERE (CURDATE() >= Opening_Date AND (CURDATE() <= End_Date OR End_Date IS NOT NULL))
     ORDER BY Opening_Date ASC
     LIMIT 3;`, (error, results) => {
