@@ -1394,10 +1394,10 @@ const getEmployees = (req, res) => {
   req.on("end", () => {
     try {
       const data = JSON.parse(body);
-      console.log("PUT request body:", data); 
+      console.log("GET request body:", data); 
       const { Exhibit_Name } = data;
       pool.query(
-        "SELECT artworks.Art_ID, artworks.Art_Name FROM artworks LEFT JOIN exhibitions ON artworks.Exhibit_Name = exhibitions.Exhibit_Name WHERE exhibitions.Exhibit_Name=?",
+        "SELECT * FROM exhibitions WHERE exhibitions.Exhibit_Name=?",
         [Exhibit_Name],
         (error, results) => {
           if (error) {
