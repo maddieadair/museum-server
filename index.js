@@ -38,6 +38,8 @@ const server = http.createServer((req, res) => {
 
   } else if (pathname === "/exhibitions" && req.method === "GET") {
     getExhibitions(req, res);
+  } else if (pathname === "/ordered-exhibitions" && req.method === "GET") {
+    getOrderedExhibitions(req, res);
   } else if (pathname === "/exhibitions" && req.method === "POST") {
     addExhibition(req, res);
   } else if (pathname === "/exhibitions" && req.method === "PUT") {
@@ -446,15 +448,30 @@ const deleteGiftItem = (req, res) => {
 
   // ------------------------------------------------ EXHIBITIONS ------------------------------------------------
 
+    // GET
+    const getExhibitions = (req, res) => {
+        pool.query(`SELECT Exhibit_Name, Curator_ID, Description, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date FROM exhibitions;`, (error, results) => {
+            if (error) {
+            console.error("Error getting exhibtions:", error);
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ message: "Internal server error" }));
+          } else {
+            console.log("Sending exhibitions:", results);
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify(results));
+          }
+        });
+      };
+
   // GET
-  const getExhibitions = (req, res) => {
-    pool.query(`SELECT Exhibit_Name, Curator_ID, Description, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date FROM exhibitions;`, (error, results) => {
+  const getOrderedExhibitions = (req, res) => {
+    pool.query(`SELECT Exhibit_Name, Curator_ID, Description, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date FROM exhibitions ORDER BY Opening_Date ASC;`, (error, results) => {
         if (error) {
-        console.error("Error getting exhibtions:", error);
+        console.error("Error getting ordered exhibtions:", error);
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ message: "Internal server error" }));
       } else {
-        console.log("Sending exhibitions:", results);
+        console.log("Sending ordered exhibitions:", results);
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(results));
       }
