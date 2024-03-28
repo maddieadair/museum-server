@@ -1,5 +1,6 @@
 const http = require("http");
 const { parse } = require("url");
+// const url = require("url")
 const mysql = require("mysql");
 
 const pool = mysql.createPool({
@@ -10,6 +11,9 @@ const pool = mysql.createPool({
   port: "3306",
   timezone : "+00:00"
 });
+
+// NEED TO CHANGE USERS TO CUSTOMERS
+
 
 const server = http.createServer((req, res) => {
   handleCors(req, res);
@@ -33,7 +37,7 @@ const server = http.createServer((req, res) => {
     addDonation(req, res);
   } else if (pathname === "/donations" && req.method === "DELETE") {
     deleteDonation(req, res);
-  } else if (pathname === "/userDonations" && req.method === "GET") {
+  } else if (pathname === "/user-donations" && req.method === "POST") {
     getUserDonations(req, res);
 
   } else if (pathname === "/exhibitions" && req.method === "GET") {
@@ -48,12 +52,12 @@ const server = http.createServer((req, res) => {
     deleteExhibition(req, res);
   } else if (pathname === "/exhibitions-three" && req.method === "GET") {
     getCurrentThreeExhibitions(req, res);
-} else if (pathname === "/get-exhibition" && req.method === "GET") {
+} else if (pathname === "/get-exhibition" && req.method === "POST") {
     getAnExhibition(req, res);
 
   } else if (pathname === "/users" && req.method === "GET") {
     getUsers(req, res);
-  } else if (pathname === "/getUser" && req.method === "GET") {
+  } else if (pathname === "/getUser" && req.method === "POST") {
     getAUser(req, res);
   } else if (pathname === "/users" && req.method === "POST") {
     addUser(req, res);
@@ -88,7 +92,7 @@ const server = http.createServer((req, res) => {
     updateTicket(req, res);
   } else if (pathname === "/tickets" && req.method === "POST") {
     addTicket(req, res);
-  } else if (pathname === "/userTickets" && req.method === "GET") {
+  } else if (pathname === "/user-tickets" && req.method === "POST") {
     getUserTickets(req, res);
 
 
@@ -109,13 +113,13 @@ const server = http.createServer((req, res) => {
   } else if (pathname === "/artworks" && req.method === "PUT") {
     updateArtwork(req, res);
   } else if (pathname === "/artworks" && req.method === "POST") {
-    updateArtwork(req, res);
-} else if (pathname === "/exhibition-art" && req.method === "GET") {
+    addArtwork(req, res);
+} else if (pathname === "/exhibition-art" && req.method === "POST") {
     getExhibArt(req, res);
 
   } else if (pathname === "/gift-log" && req.method === "GET") {
     getTicketTransactions(req, res);
-  } else if (pathname === "/userGifts" && req.method === "GET") {
+  } else if (pathname === "/user-gifts" && req.method === "POST") {
     getUserGifts(req, res);
   } else if (pathname === "/gift-log" && req.method === "DELETE") {
     deleteGiftTransaction(req, res);
@@ -1395,9 +1399,10 @@ const getEmployees = (req, res) => {
     try {
       const data = JSON.parse(body);
       console.log("GET request body:", data); 
-      const { Exhibit_Name } = data;
+      const Exhibit_Name = data.Exhibit_Name;
+      //const { Exhibit_Name } = data;
       pool.query(
-        "SELECT * FROM exhibitions WHERE exhibitions.Exhibit_Name=?",
+        "SELECT artworks.Art_ID, artworks.Art_Name FROM artworks LEFT JOIN exhibitions ON artworks.Exhibit_Name = exhibitions.Exhibit_Name WHERE exhibitions.Exhibit_Name=?",
         [Exhibit_Name],
         (error, results) => {
           if (error) {
