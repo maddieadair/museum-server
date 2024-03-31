@@ -1,37 +1,132 @@
-const pool = require("../config/db.js");
+const http = require("http");
+const mysql = require("mysql");
+const db = require("../config/db");
 
-// ------------------------------------------------ ARTWORKS ------------------------------------------------
-
-// GET
+// Get all artworks
 const getArtworks = (req, res) => {
-  pool.query("SELECT * from artworks", (error, results) => {
+  db.query(`SELECT *, YEAR(Date_Acquired) AS Year_Acquired, YEAR(Date_Created) AS Year_Created FROM artworks`, (error, result) => {
     if (error) {
-      console.error("Error getting artworks:", error);
       res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Internal server error" }));
+      res.end(JSON.stringify({ error: error }));
     } else {
-      console.log("Sending artworks:", results);
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(results));
+      res.end(JSON.stringify(result));
     }
   });
 };
 
-// EVERYTHING BELOW HERE IS NOT DONE
+// Get all artworks in a collection
+const collectionArtworks = (req, res) => {
+  let data = "";
+  req.on("data", (chunk) => {
+    data += chunk;
+  });
 
-// PUT
-const updateArtwork = (req, res) => {
-  console.log("updateArtwork");
+  req.on("end", () => {
+    const body = JSON.parse(data);
+    const Collection_ID = parseInt(body.Collection_ID);
+
+    db.query(
+      "SELECT *, YEAR(Date_Acquired) AS Year_Acquired, YEAR(Date_Created) AS Year_Created FROM artworks WHERE Collection_ID = ?",
+      [Collection_ID],
+      (error, result) => {
+        if (error) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: error }));
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        }
+      }
+    );
+  });
 };
 
-// POST
-const addArtwork = (req, res) => {
-  console.log("addArtwork");
+// Get artwork by ID
+const artworkByID = (req, res) => {
+    let data = "";
+    req.on("data", (chunk) => {
+      data += chunk;
+    });
+  
+    req.on("end", () => {
+      const body = JSON.parse(data);
+      const Art_ID = parseInt(body.Art_ID);
+  
+      db.query(
+        "SELECT artworks.*, YEAR(Date_Acquired) AS Year_Acquired, YEAR(Date_Created) AS Year_Created, department.department_name FROM artworks, department WHERE Art_ID = ? AND artworks.Department_ID = department.department_id",
+        [Art_ID],
+        (error, result) => {
+          if (error) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: error }));
+          } else {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify(result));
+          }
+        }
+      );
+    });
+  };
+
+// Get all artworks in an exhibition
+const exhibitionArtworks = (req, res) => {
+  let data = "";
+  req.on("data", (chunk) => {
+    data += chunk;
+  });
+
+  req.on("end", () => {
+    const body = JSON.parse(data);
+    const Exhibit_ID = parseInt(body.Exhibit_ID);
+
+    db.query(
+      "SELECT *, YEAR(Date_Acquired) AS Year_Acquired, YEAR(Date_Created) AS Year_Created FROM artworks WHERE Exhibit_ID = ?",
+      [Exhibit_ID],
+      (error, result) => {
+        if (error) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: error }));
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        }
+      }
+    );
+  });
 };
 
-// DELETE
-const deleteArtwork = (req, res) => {
-  console.log("deleteArtwork");
+// Get all artworks in a department
+const departmentArtworks = (req, res) => {
+  let data = "";
+  req.on("data", (chunk) => {
+    data += chunk;
+  });
+
+  req.on("end", () => {
+    const body = JSON.parse(data);
+    const Department_ID = parseInt(body.Department_ID);
+
+    db.query(
+      "SELECT *, YEAR(Date_Acquired) AS Year_Acquired, YEAR(Date_Created) AS Year_Created FROM artworks WHERE Department_ID = ?",
+      [Department_ID],
+      (error, result) => {
+        if (error) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: error }));
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        }
+      }
+    );
+  });
 };
 
-module.exports = { getArtworks, updateArtwork, addArtwork, deleteArtwork };
+module.exports = {
+  getArtworks,
+  collectionArtworks,
+  exhibitionArtworks,
+  departmentArtworks,
+  artworkByID,
+};

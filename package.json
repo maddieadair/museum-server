@@ -1,17 +1,21 @@
 {
-  "name": "museum-server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^16.4.5",
-    "mysql": "^2.18.1"
+    "name": "museum-server",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "node index.js"
+    },
+    "engines": {
+      "node": "20.x"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+      "mysql": "^2.18.1",
+      "serve": "^14.2.1"
+    }
   }
-}
+  

@@ -1,167 +1,88 @@
-const pool = require("../config/db.js");
+const http = require("http");
+const mysql = require("mysql");
+const db = require("../config/db");
 
-// ------------------------------------------------ EXHIBITIONS ------------------------------------------------
-
-// GET
+// Get all exhibitions
 const getExhibitions = (req, res) => {
-  pool.query("SELECT * FROM exhibitions", (error, results) => {
-    if (error) {
-      console.error("Error getting exhibtions:", error);
-      res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Internal server error" }));
-    } else {
-      console.log("Sending exhibitions:", results);
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(results));
+  db.query(
+    `SELECT Exhibit_Name, Exhibit_ID, Curator_ID, Description, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date, Exhibition_Department, Tickets_Sold FROM exhibitions;`,
+    (error, result) => {
+      if (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: error }));
+      } else {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(result));
+      }
     }
-  });
+  );
 };
 
-// GET
-const getCurrentThreeExhibitions = (req, res) => {
-  pool.query("SELECT * FROM exhibitions LIMIT 3", (error, results) => {
-    if (error) {
-      console.error("Error getting top 3 current exhibtions:", error);
-      res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Internal server error" }));
-    } else {
-      console.log("Sending top 3 current exhibitions:", results);
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(results));
+// Get Current 3 Exhibitions On View for Homepage
+const exhibitionsPreview = (req, res) => {
+  db.query(
+    `SELECT Exhibit_Name, Exhibit_ID, Curator_ID, Description, Exhibition_Department, Tickets_Sold, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date FROM exhibitions
+            WHERE (CURDATE() >= Opening_Date AND (CURDATE() <= End_Date OR End_Date IS NULL))
+            ORDER BY Opening_Date ASC
+            LIMIT 3;`,
+    (error, result) => {
+      if (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: error }));
+      } else {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(result));
+      }
     }
-  });
+  );
 };
 
-// POST
-const addExhibition = (req, res) => {
-  let body = "";
+// Get all exhibitions in date order
+const orderedExhibitions = (req, res) => {
+  db.query(
+    `SELECT Exhibit_Name, Exhibit_ID, Curator_ID, Description, Exhibition_Department, Tickets_Sold, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date FROM exhibitions ORDER BY Opening_Date ASC;`,
+    (error, result) => {
+      if (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: error }));
+      } else {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(result));
+      }
+    }
+  );
+};
 
+// Get Exhibition by ID
+const getExhibitionByID = (req, res) => {
+  let data = "";
   req.on("data", (chunk) => {
-    body += chunk.toString();
+    data += chunk;
   });
 
   req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("POST request body:", data); // Log the request body
-      const { Exhibit_Name, Curator_ID, Description, Opening_Date, End_Date } =
-        data;
-      pool.query(
-        "INSERT INTO exhibitions(Exhibit_Name, Curator_ID, Description, Opening_Date, End_Date) VALUES (?, ?, ?, ?, ?)",
-        [Exhibit_Name, Curator_ID, Description, Opening_Date, End_Date],
-        (error, results) => {
-          if (error) {
-            console.error("Error adding exhibition:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-              JSON.stringify({ message: "Exhibition added successfully" }),
-            );
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
-  });
-};
+    const body = JSON.parse(data);
+    const Exhibit_ID = parseInt(body.Exhibit_ID);
 
-// DELETE
-const deleteExhibition = (req, res) => {
-  let body = "";
-
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-
-  req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("DELETE request body:", data);
-      const { Exhibit_Name } = data;
-      pool.query(
-        "DELETE FROM exhibitions WHERE Exhibit_Name=?",
-        [Exhibit_Name],
-        (error, results) => {
-          if (error) {
-            console.error("Error deleting exhibition:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-              JSON.stringify({ message: "Exhibition deleted successfully" }),
-            );
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
-  });
-};
-
-// PUT
-const updateExhibition = (req, res) => {
-  let body = "";
-
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-
-  req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("PUT request body:", data);
-      const {
-        New_Exhibit_Name,
-        Curator_ID,
-        Description,
-        Opening_Date,
-        End_Date,
-        Exhibit_Name,
-      } = data;
-      pool.query(
-        "UPDATE exhibitions SET Exhibit_Name=?, Curator_ID=?, Description=?, Opening_Date=?, End_Date=? WHERE Exhibit_Name=?",
-        [
-          New_Exhibit_Name,
-          Curator_ID,
-          Description,
-          Opening_Date,
-          End_Date,
-          Exhibit_Name,
-        ],
-        (error, results) => {
-          if (error) {
-            console.error("Error updating exhibition:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-              JSON.stringify({ message: "Exhibition updated successfully" }),
-            );
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
+    db.query(
+      `SELECT Exhibit_Name, Exhibit_ID, Curator_ID, Description, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date, Exhibition_Department, Tickets_Sold FROM exhibitions WHERE Exhibit_ID = ?;`,
+      [Exhibit_ID],
+      (error, result) => {
+        if (error) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: error }));
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        }
+      }
+    );
   });
 };
 
 module.exports = {
   getExhibitions,
-  getCurrentThreeExhibitions,
-  addExhibition,
-  deleteExhibition,
-  updateExhibition,
+  exhibitionsPreview,
+  orderedExhibitions,
+  getExhibitionByID,
 };

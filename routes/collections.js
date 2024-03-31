@@ -1,158 +1,77 @@
-const pool = require("../config/db.js");
+const http = require("http");
+const mysql = require("mysql");
+const db = require("../config/db");
 
-// ------------------------------------------------ COLLECTIONS ------------------------------------------------
-
-// GET
+// Get all collections
 const getCollections = (req, res) => {
-  pool.query("SELECT * from collections", (error, results) => {
+  db.query(`SELECT * from collections`, (error, result) => {
     if (error) {
-      console.error("Error getting collections:", error);
       res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Internal server error" }));
+      res.end(JSON.stringify({ error: error }));
     } else {
-      console.log("Sending collections:", results);
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(results));
+      res.end(JSON.stringify(result));
     }
   });
 };
 
-// POST
-const addCollection = (req, res) => {
-  let body = "";
-
+// Get all collections in a department
+const departmentCollections = (req, res) => {
+  let data = "";
   req.on("data", (chunk) => {
-    body += chunk.toString();
+    data += chunk;
   });
 
   req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("POST request body:", data);
-      const {
-        collection_name,
-        collection_description,
-        collections_department,
-        collection_curator_ID,
-      } = data;
-      pool.query(
-        "INSERT INTO collections(collection_name, collection_description, collections_department, collection_curator_ID) VALUES (?, ?, ?, ?)",
-        [
-          collection_name,
-          collection_description,
-          collections_department,
-          collection_curator_ID,
-        ],
-        (error, results) => {
-          if (error) {
-            console.error("Error adding collection:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-              JSON.stringify({ message: "Collection added successfully" }),
-            );
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
+    const body = JSON.parse(data);
+    const collection_departmentID = body.collection_departmentID;
+
+    db.query(
+      "SELECT * FROM collections WHERE collection_departmentID = ?",
+      [collection_departmentID],
+      (error, result) => {
+        if (error) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: error }));
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        }
+      }
+    );
   });
 };
 
-// PUT
-const updateCollection = (req, res) => {
-  let body = "";
 
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-
-  req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("Update request body:", data); // Log the request body
-      const {
-        new_collection_name,
-        collection_description,
-        collections_department,
-        collection_curator_ID,
-        collection_name,
-      } = data;
-      pool.query(
-        "UPDATE collections SET collection_name=?, collection_description=?, collections_department=?, collection_curator_ID=?  WHERE collection_name=?",
-        [
-          new_collection_name,
-          collection_description,
-          collections_department,
-          collection_curator_ID,
-          collection_name,
-        ],
-        (error, results) => {
+// Get Collection by ID
+const getCollectionByID = (req, res) => {
+    let data = "";
+    req.on("data", (chunk) => {
+      data += chunk;
+    });
+  
+    req.on("end", () => {
+      const body = JSON.parse(data);
+      const collection_id = parseInt(body.collection_id);
+  
+      db.query(
+        "SELECT * FROM collections WHERE collection_id = ?",
+        [collection_id],
+        (error, result) => {
           if (error) {
-            console.error("Error updating collection:", error);
             res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
+            res.end(JSON.stringify({ error: error }));
           } else {
             res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-              JSON.stringify({ message: "Collection updated successfully" }),
-            );
+            res.end(JSON.stringify(result));
           }
-        },
+        }
       );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
-  });
-};
-
-// DELETE
-const deleteCollection = (req, res) => {
-  let body = "";
-
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-
-  req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("DELETE request body:", data);
-      const { collection_name } = data;
-      pool.query(
-        "DELETE from collections WHERE collection_name=?",
-        [collection_name],
-        (error, results) => {
-          if (error) {
-            console.error("Error deleting collection:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-              JSON.stringify({ message: "Collection deleted successfully" }),
-            );
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
-  });
-};
+    });
+  };
 
 module.exports = {
   getCollections,
-  addCollection,
-  updateCollection,
-  deleteCollection,
+  departmentCollections,
+  getCollectionByID,
 };
