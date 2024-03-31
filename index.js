@@ -490,7 +490,7 @@ const deleteGiftItem = (req, res) => {
     ORDER BY Opening_Date ASC
     LIMIT 3;`, (error, results) => {
         if (error) {
-        console.error("Error getting top 3 current exhibtions:", error);
+        console.error("Error getting top 3 current exhibitions:", error);
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ message: "Internal server error" }));
       } else {
