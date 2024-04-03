@@ -4,7 +4,7 @@ const db = require("../config/db");
 
 // Get all departments
 const getDepartments = (req, res) => {
-  db.query(`SELECT * from department`, (error, result) => {
+  db.query(`SELECT department.*, employees.employee_fname AS manager_fname,employees.employee_lname AS manager_lname from department, employees WHERE department.department_manager_id = employees.employee_id;`, (error, result) => {
     if (error) {
       res.writeHead(500, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: error }));
@@ -27,7 +27,7 @@ const getDepartmentByID = (req, res) => {
     const department_id = parseInt(body.department_id);
 
     db.query(
-      "SELECT * FROM department WHERE department_id = ?",
+      "SELECT department.*, employees.employee_fname AS manager_fname, employees.employee_lname AS manager_lname FROM department LEFT JOIN employees ON department.department_manager_id = employees.employee_id WHERE department.department_id = ?;",
       [department_id],
       (error, result) => {
         if (error) {

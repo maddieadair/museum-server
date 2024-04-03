@@ -5,7 +5,9 @@ const db = require("../config/db");
 // Get all exhibitions
 const getExhibitions = (req, res) => {
   db.query(
-    `SELECT Exhibit_Name, Exhibit_ID, Curator_ID, Description, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date, Exhibition_Department, Tickets_Sold FROM exhibitions;`,
+    `SELECT exhibitions.*, department.department_name, employees.employee_fname AS curator_fname, employees.employee_lname AS curator_lname, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date
+    FROM exhibitions LEFT JOIN department ON exhibitions.Exhibition_Department = department.department_id 
+    LEFT JOIN employees ON exhibitions.Curator_ID = employees.employee_id;`,
     (error, result) => {
       if (error) {
         res.writeHead(500, { "Content-Type": "application/json" });
@@ -65,7 +67,10 @@ const getExhibitionByID = (req, res) => {
     const Exhibit_ID = parseInt(body.Exhibit_ID);
 
     db.query(
-      `SELECT Exhibit_Name, Exhibit_ID, Curator_ID, Description, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date, Exhibition_Department, Tickets_Sold FROM exhibitions WHERE Exhibit_ID = ?;`,
+      `SELECT exhibitions.*, department.department_name, employees.employee_fname AS curator_fname, employees.employee_lname AS curator_lname, DATE_FORMAT(Opening_Date, "%M %d, %Y") AS New_Open_Date, DATE_FORMAT(End_Date, "%M %d, %Y") AS New_End_Date
+      FROM exhibitions LEFT JOIN department ON exhibitions.Exhibition_Department = department.department_id 
+      LEFT JOIN employees ON exhibitions.Curator_ID = employees.employee_id 
+      WHERE exhibitions.Exhibit_ID = ?;`,
       [Exhibit_ID],
       (error, result) => {
         if (error) {
