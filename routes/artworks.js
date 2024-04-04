@@ -162,30 +162,109 @@ const getFilteredArt = (req, res) => {
     console.log("body", body);
     if (Object.keys(body).length !== 0) {
       sql += ` WHERE`;
+
+      if (body["Include_Exhibit"] == true) {
+        sql += ` Exhibit_ID IS NOT NULL`;
+        if (body["Exhibit_ID"]) {
+          const Exhibit_ID = body.Exhibit_ID;
+          params.push(Exhibit_ID);
+          if (Array.isArray(body["Exhibit_ID"])) {
+            sql += ` AND Exhibit_ID IN (?)`;
+          } else {
+            sql += ` AND Exhibit_ID = ?`;
+          }
+        }
+      } else {
+        sql += ` Exhibit_ID IS NULL`;
+      }
+
       if (body["Culture"]) {
         const Culture = body.Culture;
         params.push(Culture);
-        sql += ` Culture IN (?)`;
+        console.log("Culture length", body["Culture"].length);
+        if (Array.isArray(body["Culture"])) {
+          if (params.length === 0) {
+            sql += ` Culture IN (?)`;
+          } else {
+            sql += ` AND Culture IN (?)`;
+          }
+        } else {
+          if (params.length === 0) {
+            sql += ` Culture = ?`;
+          } else {
+            sql += ` AND Culture = ?`;
+          }
+        }
       }
 
       if (body["Collection_ID"]) {
         const Collection_ID = body.Collection_ID;
         params.push(Collection_ID);
-        sql += ` Collection_ID IN (?)`;
+        if (Array.isArray(body["Collection_ID"])) {
+          if (params.length === 0) {
+            sql += ` Collection_ID IN (?)`;
+          } else {
+            sql += ` AND Collection_ID IN (?)`;
+          }
+        } else {
+          if (params.length === 0) {
+            sql += ` Collection_ID = ?`;
+          } else {
+            sql += ` AND Collection_ID = ?`;
+          }
+        }
       }
 
-      if (body["Exhibit_ID"]) {
-        const Exhibit_ID = body.Exhibit_ID;
-        params.push(Exhibit_ID);
-        sql += ` Exhibit_ID IN (?)`;
+      if (body["Medium"]) {
+        const Medium = body.Medium;
+        params.push(Medium);
+        if (Array.isArray(body["Medium"])) {
+          if (params.length === 0) {
+            sql += ` Medium IN (?)`;
+          } else {
+            sql += ` AND Medium IN (?)`;
+          }
+        } else {
+          if (params.length === 0) {
+            sql += ` Medium = ?`;
+          } else {
+            sql += ` AND Medium = ?`;
+          }
+        }
       }
 
       if (body["Department_ID"]) {
         const Department_ID = body.Department_ID;
         params.push(Department_ID);
-        sql += ` Department_ID IN (?)`;
+        if (Array.isArray(body["Department_ID"])) {
+          if (params.length === 0) {
+            sql += ` Department_ID IN (?)`;
+          } else {
+            sql += ` AND Department_ID IN (?)`;
+          }
+        } else {
+          if (params.length === 0) {
+            sql += ` Department_ID = ?`;
+          } else {
+            sql += ` AND Department_ID = ?`;
+          }
+        }
+      }
+
+      if (body["On_View"]) {
+        const On_View = body.On_View;
+        if (body["On_View"] === true) {
+          params.push(On_View);
+          if (params.length === 0) {
+            sql += ` On_View = 1`;
+          } else {
+            sql += ` AND On_View = 1`;
+          }
+        }
       }
     }
+
+    console.log("sql:", sql);
 
     db.query(sql, params, (error, result) => {
       if (error) {
