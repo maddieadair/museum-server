@@ -157,25 +157,28 @@ const getFilteredArt = (req, res) => {
     const body = JSON.parse(data);
 
     let params = [];
-    let sql = `SELECT Art_ID, Art_Name, YEAR(Date_Created) AS Year_Created, Artist_Fname, Artist_Lname FROM artworks`;
+    let sql = `SELECT artworks.Art_ID, artworks.Art_Name, artworks.Culture, artworks.Medium, artworks.Collection_ID, artworks.Exhibit_ID, artworks.Department_ID, artworks.Artist_Fname, artworks.Artist_Lname, artworks.On_View, YEAR(Date_Acquired) AS Year_Acquired, YEAR(Date_Created) AS Year_Created, department.department_name, exhibitions.Exhibit_Name, collections.collection_name FROM artworks 
+    LEFT JOIN department ON artworks.Department_ID = department.department_id 
+    LEFT JOIN collections ON artworks.Collection_ID = collections.collection_id
+    LEFT JOIN exhibitions ON artworks.Exhibit_ID = exhibitions.Exhibit_ID`;
 
     console.log("body", body);
     if (Object.keys(body).length !== 0) {
       sql += ` WHERE`;
 
       if (body["Include_Exhibit"] && body["Include_Exhibit"] === true) {
-          sql += ` Exhibit_ID IS NOT NULL`;
-          if (body["Exhibit_ID"]) {
-            const Exhibit_ID = body.Exhibit_ID;
-            params.push(Exhibit_ID);
-            if (Array.isArray(body["Exhibit_ID"])) {
-              sql += ` AND Exhibit_ID IN (?)`;
-            } else {
-              sql += ` AND Exhibit_ID = ?`;
-            }
+        sql += ` artworks.Exhibit_ID IS NOT NULL`;
+        if (body["Exhibit_ID"]) {
+          const Exhibit_ID = body.Exhibit_ID;
+          params.push(Exhibit_ID);
+          if (Array.isArray(body["Exhibit_ID"])) {
+            sql += ` AND artworks.Exhibit_ID IN (?)`;
+          } else {
+            sql += ` AND artworks.Exhibit_ID = ?`;
+          }
         }
       } else {
-        sql += ` Exhibit_ID IS NULL`;
+        sql += ` artworks.Exhibit_ID IS NULL`;
       }
 
       if (body["Culture"]) {
