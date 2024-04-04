@@ -163,16 +163,16 @@ const getFilteredArt = (req, res) => {
     if (Object.keys(body).length !== 0) {
       sql += ` WHERE`;
 
-      if (body["Include_Exhibit"] == true) {
-        sql += ` Exhibit_ID IS NOT NULL`;
-        if (body["Exhibit_ID"]) {
-          const Exhibit_ID = body.Exhibit_ID;
-          params.push(Exhibit_ID);
-          if (Array.isArray(body["Exhibit_ID"])) {
-            sql += ` AND Exhibit_ID IN (?)`;
-          } else {
-            sql += ` AND Exhibit_ID = ?`;
-          }
+      if (body["Include_Exhibit"] && body["Include_Exhibit"] === true) {
+          sql += ` Exhibit_ID IS NOT NULL`;
+          if (body["Exhibit_ID"]) {
+            const Exhibit_ID = body.Exhibit_ID;
+            params.push(Exhibit_ID);
+            if (Array.isArray(body["Exhibit_ID"])) {
+              sql += ` AND Exhibit_ID IN (?)`;
+            } else {
+              sql += ` AND Exhibit_ID = ?`;
+            }
         }
       } else {
         sql += ` Exhibit_ID IS NULL`;
