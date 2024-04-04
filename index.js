@@ -127,6 +127,9 @@ const server = http.createServer((req, res) => {
       // Get Artwork by ID
     } else if (req.url === "/artwork-ID") {
       artworks.artworkByID(req, res);
+
+    } else if (req.url === "/filtered-art") {
+        artworks.getFilteredArt(req, res);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
