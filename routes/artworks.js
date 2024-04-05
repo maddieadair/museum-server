@@ -187,15 +187,15 @@ const getFilteredArt = (req, res) => {
         console.log("Culture length", body["Culture"].length);
         if (Array.isArray(body["Culture"])) {
           if (params.length === 0) {
-            sql += ` Culture IN (?)`;
+            sql += ` artworks.Culture IN (?)`;
           } else {
-            sql += ` AND Culture IN (?)`;
+            sql += ` AND artworks.Culture IN (?)`;
           }
         } else {
           if (params.length === 0) {
-            sql += ` Culture = ?`;
+            sql += ` artworks.Culture = ?`;
           } else {
-            sql += ` AND Culture = ?`;
+            sql += ` AND artworks.Culture = ?`;
           }
         }
       }
@@ -205,15 +205,15 @@ const getFilteredArt = (req, res) => {
         params.push(Collection_ID);
         if (Array.isArray(body["Collection_ID"])) {
           if (params.length === 0) {
-            sql += ` Collection_ID IN (?)`;
+            sql += ` artworks.Collection_ID IN (?)`;
           } else {
-            sql += ` AND Collection_ID IN (?)`;
+            sql += ` AND artworks.Collection_ID IN (?)`;
           }
         } else {
           if (params.length === 0) {
-            sql += ` Collection_ID = ?`;
+            sql += ` artworks.Collection_ID = ?`;
           } else {
-            sql += ` AND Collection_ID = ?`;
+            sql += ` AND artworks.Collection_ID = ?`;
           }
         }
       }
@@ -223,15 +223,15 @@ const getFilteredArt = (req, res) => {
         params.push(Medium);
         if (Array.isArray(body["Medium"])) {
           if (params.length === 0) {
-            sql += ` Medium IN (?)`;
+            sql += ` artworks.Medium IN (?)`;
           } else {
-            sql += ` AND Medium IN (?)`;
+            sql += ` AND artworks.Medium IN (?)`;
           }
         } else {
           if (params.length === 0) {
-            sql += ` Medium = ?`;
+            sql += ` artworks.Medium = ?`;
           } else {
-            sql += ` AND Medium = ?`;
+            sql += ` AND artworks.Medium = ?`;
           }
         }
       }
@@ -241,15 +241,15 @@ const getFilteredArt = (req, res) => {
         params.push(Department_ID);
         if (Array.isArray(body["Department_ID"])) {
           if (params.length === 0) {
-            sql += ` Department_ID IN (?)`;
+            sql += ` artworks.Department_ID IN (?)`;
           } else {
-            sql += ` AND Department_ID IN (?)`;
+            sql += ` AND artworks.Department_ID IN (?)`;
           }
         } else {
           if (params.length === 0) {
-            sql += ` Department_ID = ?`;
+            sql += ` artworks.Department_ID = ?`;
           } else {
-            sql += ` AND Department_ID = ?`;
+            sql += ` AND artworks.Department_ID = ?`;
           }
         }
       }
@@ -259,9 +259,9 @@ const getFilteredArt = (req, res) => {
         if (body["On_View"] === true) {
           params.push(On_View);
           if (params.length === 0) {
-            sql += ` On_View = 1`;
+            sql += ` artworks.On_View = 1`;
           } else {
-            sql += ` AND On_View = 1`;
+            sql += ` AND artworks.On_View = 1`;
           }
         }
       }
