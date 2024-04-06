@@ -10,6 +10,7 @@ const donations = require("./routes/donations");
 const employee = require("./routes/employee");
 const exhibitions = require("./routes/exhibitions");
 const gifts = require("./routes/gifts");
+const gift_log = require("./routes/gift-log");
 
 const server = http.createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -70,7 +71,11 @@ const server = http.createServer((req, res) => {
       // Get all employees
     } else if (req.url === "/employees") {
       employee.getEmployees(req, res);
-    }
+
+    // Get all gift transactions
+    } else if (req.url === "/gift-log") {
+        gift_log.getGiftTransactions(req, res);
+      }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
