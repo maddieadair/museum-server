@@ -72,10 +72,10 @@ const server = http.createServer((req, res) => {
     } else if (req.url === "/employees") {
       employee.getEmployees(req, res);
 
-    // Get all gift transactions
+      // Get all gift transactions
     } else if (req.url === "/gift-log") {
-        gift_log.getGiftTransactions(req, res);
-      }
+      gift_log.getGiftTransactions(req, res);
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -132,9 +132,36 @@ const server = http.createServer((req, res) => {
       // Get Artwork by ID
     } else if (req.url === "/artwork-ID") {
       artworks.artworkByID(req, res);
-
     } else if (req.url === "/filtered-art") {
-        artworks.getFilteredArt(req, res);
+      artworks.getFilteredArt(req, res);
+
+      // Add gift item
+    } else if (req.url === "/gifts") {
+      gifts.addGift(req, res);
+
+      // Add gift transaction
+    } else if (req.url === "/gift-log") {
+        gift_log.addGiftTransaction(req, res);
+      }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // DELETE methods
+  } else if (req.method === "DELETE") {
+    // Add new donation
+    if (req.url === "/gifts") {
+      gifts.deleteGift(req, res);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // PUT methods
+  } else if (req.method === "PUT") {
+
+    // Update gift item
+    if (req.url === "/gifts") {
+      gifts.updateGift(req, res);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
