@@ -27,10 +27,11 @@ const addGiftTransaction = (req, res) => {
       const item_ID = parseInt(body.item_ID);
       const customer_ID = parseInt(body.customer_ID);
       const total_bill = parseInt(body.total_bill);
+      const transaction_quantity = parseInt(body.transaction_quantity);
 
       db.query(
-        "INSERT INTO gift_log(item_ID, customer_ID, total_bill) VALUES (?, ?, ?);",
-        [item_ID, customer_ID, total_bill],
+        "INSERT INTO gift_log(item_ID, customer_ID, total_bill, transaction_quantity) VALUES (?, ?, ?, ?);",
+        [item_ID, customer_ID, total_bill, transaction_quantity],
         (error, result) => {
           if (error) {
             res.writeHead(500, { "Content-Type": "application/json" });
