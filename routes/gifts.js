@@ -33,8 +33,9 @@ const addGift = (req, res) => {
         [gift_name, gift_price, gift_currStock],
         (error, result) => {
           if (error) {
+            console.log(error)
             res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: 'Error adding the gift item' }));
+            res.end(JSON.stringify({ message: error }));
             //res.end(JSON.stringify({ error: error }));
           } else {
             res.writeHead(200, { "Content-Type": "application/json" });
@@ -65,6 +66,7 @@ const updateGift = (req, res) => {
         [gift_name, gift_price, gift_currStock, gift_index],
         (error, result) => {
           if (error) {
+            console.log(error)
             res.writeHead(500, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ message: 'Error updating the gift item' }));
             //res.end(JSON.stringify({ error: error }));
@@ -93,6 +95,7 @@ const deleteGift = (req, res) => {
         [gift_index],
         (error, result) => {
           if (error) {
+            console.log(error)
             res.writeHead(500, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ message: 'Error deleting the gift item' }));
             //res.end(JSON.stringify({ error: error }));

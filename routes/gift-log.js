@@ -4,7 +4,7 @@ const db = require("../config/db");
 
 // Get all gift transactions
 const getGiftTransactions = (req, res) => {
-  db.query(`SELECT gift_log.*, gifts.gift_name from gift_log, gifts WHERE gift_log.item_ID = gifts.gift_index`, (error, result) => {
+  db.query(`SELECT gift_log.*, gifts.gift_name, DATE_FORMAT(transaction_date, "%M %d, %Y") AS New_Date from gift_log, gifts WHERE gift_log.item_ID = gifts.gift_index`, (error, result) => {
     if (error) {
       res.writeHead(500, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: error }));
