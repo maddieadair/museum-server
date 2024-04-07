@@ -60,6 +60,22 @@ const getLowStock = (req, res) => {
   );
 };
 
+// Get worstsellers
+const getWorstsellers = (req, res) => {
+    db.query(
+      `SELECT * from gifts WHERE gift_numSold = 0;`,
+      (error, result) => {
+        if (error) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: error }));
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        }
+      },
+    );
+  };
+
 // Get top three bestsellers
 const getBestsellers = (req, res) => {
   db.query(
@@ -180,5 +196,6 @@ module.exports = {
   getBestsellers,
   getNumSoldDesc,
   getSoldOut,
-  getLowStock
+  getLowStock,
+  getWorstsellers
 };

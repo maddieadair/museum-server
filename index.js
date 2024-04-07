@@ -95,6 +95,10 @@ const server = http.createServer((req, res) => {
       // Get Shop Bestsellers
     } else if (req.url === "/bestsellers") {
       gifts.getBestsellers(req, res);
+
+      // Get Shop Worstsellers
+    } else if (req.url === "/worstsellers") {
+      gifts.getWorstsellers(req, res);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
