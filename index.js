@@ -75,6 +75,26 @@ const server = http.createServer((req, res) => {
       // Get all gift transactions
     } else if (req.url === "/gift-log") {
       gift_log.getGiftTransactions(req, res);
+
+      // Get shop revenue
+    } else if (req.url === "/shop-revenue") {
+      gift_log.getShopRevenue(req, res);
+
+      // Get Num of Items Sold Desc order
+    } else if (req.url === "/num-sold") {
+      gifts.getNumSoldDesc(req, res);
+
+      // Add gift transaction
+    } else if (req.url === "/sold-out") {
+      gifts.getSoldOut(req, res);
+
+      // Get Low Stock items
+    } else if (req.url === "/low-stock") {
+      gifts.getLowStock(req, res);
+
+      // Get Shop Bestsellers
+    } else if (req.url === "/bestsellers") {
+      gifts.getBestsellers(req, res);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,8 +161,8 @@ const server = http.createServer((req, res) => {
 
       // Add gift transaction
     } else if (req.url === "/gift-log") {
-        gift_log.addGiftTransaction(req, res);
-      }
+      gift_log.addGiftTransaction(req, res);
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -153,12 +173,10 @@ const server = http.createServer((req, res) => {
       gifts.deleteGift(req, res);
     }
 
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     // PUT methods
   } else if (req.method === "PUT") {
-
     // Update gift item
     if (req.url === "/gifts") {
       gifts.updateGift(req, res);
