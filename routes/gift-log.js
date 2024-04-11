@@ -55,7 +55,7 @@ const addGiftTransaction = (req, res) => {
         if (error) {
           res.writeHead(500, { "Content-Type": "application/json" });
           res.end(
-            JSON.stringify({ message: "Error adding the gift transaction" }),
+            JSON.stringify({ error: error }),
           );
           //res.end(JSON.stringify({ error: error }));
         } else {
@@ -69,8 +69,64 @@ const addGiftTransaction = (req, res) => {
   });
 };
 
+// Get gift transactions for a customer by ID
+const getCustomerGifts = (req, res) => {
+    let data = "";
+    req.on("data", (chunk) => {
+      data += chunk;
+    });
+  
+    req.on("end", () => {
+      const body = JSON.parse(data);
+      const customer_ID = parseInt(body.customer_ID);
+  
+      db.query(
+        `SELECT gift_log.*, gifts.gift_name, DATE_FORMAT(transaction_date, "%M %d, %Y") AS New_Date from gift_log, gifts WHERE gift_log.item_ID = gifts.gift_index AND customer_ID = ?`,
+        [customer_ID],
+        (error, result) => {
+          if (error) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: error }));
+          } else {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify(result));
+          }
+        },
+      );
+    });
+  };
+
+  // Get gift transactions by ID
+const getGiftTransactionByID = (req, res) => {
+    let data = "";
+    req.on("data", (chunk) => {
+      data += chunk;
+    });
+  
+    req.on("end", () => {
+      const body = JSON.parse(data);
+      const gift_transactionID = parseInt(body.gift_transactionID);
+  
+      db.query(
+        `SELECT gift_log.*, gifts.gift_name, DATE_FORMAT(transaction_date, "%M %d, %Y") AS New_Date from gift_log, gifts WHERE gift_log.item_ID = gifts.gift_index AND gift_transactionID = ?`,
+        [gift_transactionID],
+        (error, result) => {
+          if (error) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: error }));
+          } else {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify(result));
+          }
+        },
+      );
+    });
+  };
+
 module.exports = {
   getGiftTransactions,
   addGiftTransaction,
   getShopRevenue,
+  getCustomerGifts,
+  getGiftTransactionByID
 };

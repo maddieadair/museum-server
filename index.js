@@ -11,10 +11,12 @@ const employee = require("./routes/employee");
 const exhibitions = require("./routes/exhibitions");
 const gifts = require("./routes/gifts");
 const gift_log = require("./routes/gift-log");
+const tickets = require("./routes/tickets");
+const auth = require("./authentication/auth");
 
 const server = http.createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -99,7 +101,65 @@ const server = http.createServer((req, res) => {
       // Get Shop Worstsellers
     } else if (req.url === "/worstsellers") {
       gifts.getWorstsellers(req, res);
-    }
+
+      // Get Donations
+    } else if (req.url === "/donations") {
+      donations.getDonations(req, res);
+
+      // Get Tickets
+    } else if (req.url === "/tickets") {
+      tickets.getTickets(req, res);
+
+      // Get Managers
+    } else if (req.url === "/managers") {
+      employee.getManagers(req, res);
+
+      // Get Curators
+    } else if (req.url === "/curators") {
+      employee.getCurators(req, res);
+
+      // Get Shop Managers
+    } else if (req.url === "/shop-managers") {
+      employee.getShopManagers(req, res);
+
+      // Get Managers without a department
+    } else if (req.url === "/new-managers") {
+      employee.getNewManagers(req, res);
+
+      // Get Current Exhibitions
+    } else if (req.url === "/current-exhibits") {
+      exhibitions.getCurrentExhibitions(req, res);
+
+      // Get Future Exhibitions
+    } else if (req.url === "/future-exhibits") {
+      exhibitions.getFutureExhibitions(req, res);
+
+      // Get current exhibitions and future ones that open in a month
+    } else if (req.url === "/month-exhibits") {
+      exhibitions.getOneMonthExhibits(req, res);
+
+      // Get Past Exhibitions
+    } else if (req.url === "/past-exhibits") {
+      exhibitions.getPastExhibitions(req, res);
+    } else if (req.url === "/supervisors") {
+      employee.getSupervisors(req, res);
+    } else if (req.url === "/exhibit-stats") {
+      exhibitions.allExhibitStats(req, res);
+    } else if (req.url === "/exhibit-revenue") {
+      exhibitions.allExhibitRev(req, res);
+    } else if (req.url === "/collection-revenue") {
+      exhibitions.collectionTicketRevenue(req, res);
+    } else if (req.url === "/collection-stats") {
+      exhibitions.collectionTicketStats(req, res);
+    } else if (req.url === "/donation-rev") {
+      donations.getDonationRevenue(req, res);
+    } else if (req.url === "/donation-rev") {
+        tickets.totalExhibitSales(req, res);
+      } else if (req.url === "/exhibit-ticket-sum") {
+        exhibitions.exhibitTicketSum(req, res);
+      } else if (req.url === "/dept-no-mgr") {
+        department.getDeptNoManagers(req, res);
+      }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -111,19 +171,19 @@ const server = http.createServer((req, res) => {
 
       // Customer login
     } else if (req.url === "/customer-login") {
-      customer.customerLogin(req, res);
+      auth.customerLogin(req, res);
 
       // Check if customer exists already
     } else if (req.url === "/check-customer") {
-      customer.checkCustomer(req, res);
+      auth.checkCustomer(req, res);
 
       // Customer Signup
     } else if (req.url === "/customer-signup") {
-      customer.customerSignup(req, res);
+      auth.customerSignup(req, res);
 
       // Employee Login
     } else if (req.url === "/employee-login") {
-      employee.employeeLogin(req, res);
+      auth.employeeLogin(req, res);
 
       // Get all collections in a department
     } else if (req.url === "/department-collections") {
@@ -166,6 +226,86 @@ const server = http.createServer((req, res) => {
       // Add gift transaction
     } else if (req.url === "/gift-log") {
       gift_log.addGiftTransaction(req, res);
+
+      // Get Suboordinates
+    } else if (req.url === "/suboordinates") {
+      employee.getSuboordinates(req, res);
+
+      // Add Department
+    } else if (req.url === "/department") {
+      department.addDepartment(req, res);
+
+      // Get Customer by ID
+    } else if (req.url === "/customer-ID") {
+      customer.getCustomerByID(req, res);
+
+      // Get Customer Donations
+    } else if (req.url === "/customer-donations") {
+      donations.getCustomerDonations(req, res);
+
+      // Get Customer Gift Transactions
+    } else if (req.url === "/customer-gifts") {
+      gift_log.getCustomerGifts(req, res);
+
+      // Get Customer Ticket Transactions
+    } else if (req.url === "/customer-tickets") {
+      tickets.getCustomerTickets(req, res);
+
+      // Get Ticket by ID
+    } else if (req.url === "/ticket-ID") {
+      tickets.getTicketByID(req, res);
+
+      // Get Donation by ID
+    } else if (req.url === "/donation-ID") {
+      donations.getDonationByID(req, res);
+
+      // Get Gift Transaction by ID
+    } else if (req.url === "/gift-ID") {
+      gift_log.getGiftTransactionByID(req, res);
+
+      // Add Ticket
+    } else if (req.url === "/tickets") {
+      tickets.addTicket(req, res);
+
+      // Get Department by Name
+    } else if (req.url === "/department-name") {
+      department.getDepartmentByName(req, res);
+    } else if (req.url === "/department-col-name") {
+      collections.getDeptCollByName(req, res);
+
+      // Get Employee by ID
+    } else if (req.url === "/employee-ID") {
+      employee.getEmployeeByID(req, res);
+
+      // Add new employee
+    } else if (req.url === "/employee") {
+      employee.addEmployee(req, res);
+    } else if (req.url === "/dep-artworks") {
+      artworks.artworksInDep(req, res);
+    } else if (req.url === "/past-art") {
+      artworks.getPastArtworks(req, res);
+    } else if (req.url === "/employee-exhibits") {
+      exhibitions.employeeExhibitions(req, res);
+    } else if (req.url === "/exhibitions") {
+      exhibitions.addExhibition(req, res);
+    } else if (req.url === "/employee-cols") {
+      collections.employeeCollections(req, res);
+    } else if (req.url === "/collection") {
+      collections.addCollection(req, res);
+    } else if (req.url === "/employee-art") {
+      artworks.employeeArtworks(req, res);
+    } else if (req.url === "/artwork") {
+      artworks.addArt(req, res);
+    } else if (req.url === "/curator-exhibit-stats") {
+      exhibitions.employeeExhibitStats(req, res);
+    } else if (req.url === "/curator-exhibit-rev") {
+      exhibitions.employeeExhibitRev(req, res);
+    } else if (req.url === "/dept-exhibits") {
+      exhibitions.getDeptExhibits(req, res);
+    } else if (req.url === "/dept-exhibit-stats") {
+      exhibitions.deptExhibitStats(req, res);
+    } else if (req.url === "/dept-exhibit-rev") {
+      exhibitions.deptExhibitRev(req, res);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,6 +315,18 @@ const server = http.createServer((req, res) => {
     // Add new donation
     if (req.url === "/gifts") {
       gifts.deleteGift(req, res);
+
+      // Delete employee
+    } else if (req.url === "/employee") {
+      employee.deleteEmployee(req, res);
+    } else if (req.url === "/collection") {
+      collections.deleteCollection(req, res);
+    } else if (req.url === "/artwork") {
+      artworks.deleteArt(req, res);
+    } else if (req.url === "/exhibition") {
+      exhibitions.deleteExhibition(req, res);
+    } else if (req.url === "/department") {
+      department.deleteDept(req, res);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,6 +336,24 @@ const server = http.createServer((req, res) => {
     // Update gift item
     if (req.url === "/gifts") {
       gifts.updateGift(req, res);
+
+      // Update customer
+    } else if (req.url === "/customer") {
+      customer.updateCustomer(req, res);
+
+      // Update Employee
+    } else if (req.url === "/employee") {
+      employee.updateEmployee(req, res);
+    } else if (req.url === "/exhibition") {
+      exhibitions.updateExhibition(req, res);
+    } else if (req.url === "/archive-exhibit") {
+      exhibitions.archiveExhibition(req, res);
+    } else if (req.url === "/collection") {
+      collections.updateCollection(req, res);
+    } else if (req.url === "/artwork") {
+      artworks.updateArt(req, res);
+    } else if (req.url === "/department") {
+      department.updateDepartment(req, res);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

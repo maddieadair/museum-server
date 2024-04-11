@@ -188,6 +188,7 @@ const deleteGift = (req, res) => {
   });
 };
 
+
 module.exports = {
   getGifts,
   addGift,
@@ -197,5 +198,5 @@ module.exports = {
   getNumSoldDesc,
   getSoldOut,
   getLowStock,
-  getWorstsellers
+  getWorstsellers,
 };

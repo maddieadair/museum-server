@@ -1,103 +1,8 @@
 const http = require("http");
 const mysql = require("mysql");
 const db = require("../config/db");
-
-// Get all customers
-const getCustomers = (req, res) => {
-  db.query(`SELECT * from customers`, (error, result) => {
-    if (error) {
-      res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: error }));
-    } else {
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(result));
-    }
-  });
-};
-
-// Get Customer by ID
-const getCustomerByID = (req, res) => {
-  let data = "";
-  req.on("data", (chunk) => {
-    data += chunk;
-  });
-
-  req.on("end", () => {
-    const body = JSON.parse(data);
-    const Customer_ID = parseInt(body.Customer_ID);
-
-    db.query(
-      "SELECT * FROM customers WHERE Customer_ID = ?",
-      [Customer_ID],
-      (error, result) => {
-        if (error) {
-          res.writeHead(500, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ error: error }));
-        } else {
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify(result));
-        }
-      },
-    );
-  });
-};
-
-// Update Customer
-const updateCustomer = (req, res) => {
-  let data = "";
-  req.on("data", (chunk) => {
-    data += chunk;
-  });
-
-  req.on("end", () => {
-    const body = JSON.parse(data);
-    const Customer_Fname = body.Customer_Fname;
-    const Customer_Lname = body.Customer_Lname;
-    const Customer_Email = body.Customer_Email;
-    const Customer_Password = body.Customer_Password;
-    const Customer_Address = body.Customer_Address;
-    const Customer_City = body.Customer_City;
-    const Customer_State = body.Customer_State;
-    const Customer_Zipcode = body.Customer_Zipcode;
-    const Customer_ID = parseInt(body.Customer_ID);
-
-    db.query(
-      `UPDATE customers SET Customer_Fname = ?, Customer_Lname = ?, Customer_Email = ?, Customer_Password = ?, Customer_Address = ?, Customer_City = ?, Customer_State = ?, Customer_Zipcode = ? WHERE Customer_ID = ?`,
-      [
-        Customer_Fname,
-        Customer_Lname,
-        Customer_Email,
-        Customer_Password,
-        Customer_Address,
-        Customer_City,
-        Customer_State,
-        Customer_Zipcode,
-        Customer_ID,
-      ],
-      (error, result) => {
-        if (error) {
-          if (
-            error.sqlMessage === "An account with this email already exists"
-          ) {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-              JSON.stringify({
-                message: "An account with this email already exists",
-              }),
-            );
-          }
-          else {
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: error }));
-          }
-        } else {
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ message: "Profile update successful" }));
-        }
-      },
-    );
-  });
-};
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 // Customer login
 const customerLogin = (req, res) => {
@@ -116,15 +21,28 @@ const customerLogin = (req, res) => {
       "SELECT * FROM customers WHERE Customer_Email = ? AND Customer_Password=?",
       [Customer_Email, Customer_Password],
       (error, result) => {
+
+        const customer = result[0]
+        console.log(customer);
+
         if (error) {
           res.writeHead(500, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ error: error }));
-        } else if (result.length === 0) {
+        } else if (!customer) {
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ message: "Invalid username or password" }));
         } else {
+            const token = jwt.sign({ 
+                ID: customer.Customer_ID, 
+                role: "Customer"
+            }
+            , process.env.JWT_SECRET, {
+                expiresIn: process.env.JWT_EXPIRE,
+            });
+            console.log("token", token)
+
           res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ message: "Login successful" }));
+          res.end(JSON.stringify({ token: token}));
         }
       },
     );
@@ -239,11 +157,71 @@ const customerSignup = (req, res) => {
   });
 };
 
+// Employee login
+const employeeLogin = (req, res) => {
+  let data = "";
+  req.on("data", (chunk) => {
+    data += chunk;
+  });
+
+  req.on("end", () => {
+    const body = JSON.parse(data);
+    const employee_email = body.employee_email;
+    const employee_password = body.employee_password;
+    console.log("Update request body:", data); // Log the request body
+
+    db.query(
+      "SELECT * FROM employees WHERE employee_email = ? AND employee_password=?",
+      [employee_email, employee_password],
+      (error, result) => {
+        const employee = result[0]
+        console.log(employee)
+
+        if (error) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: error }));
+        } else if (!employee) {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ message: "Invalid username or password" }));
+        } else {
+            const token = jwt.sign({ 
+                ID: employee.employee_id, 
+                role: employee.role,
+                department: employee.dep_ID,
+            }
+            , process.env.JWT_SECRET, {
+                expiresIn: process.env.JWT_EXPIRE,
+            });
+            console.log("token", token)
+
+
+
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ token: token}));
+        }
+      },
+    );
+  });
+};
+
+const verifyToken = (req, jwt) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) return null;
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        return decoded;
+    } catch (err) {
+        console.error('Error verifying token:', err);
+        return null;
+    }
+};
+
 module.exports = {
+  employeeLogin,
   customerLogin,
   checkCustomer,
   customerSignup,
-  getCustomers,
-  getCustomerByID,
-  updateCustomer,
+  verifyToken
 };
