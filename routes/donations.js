@@ -1,178 +1,131 @@
-const pool = require("../config/db.js");
+const http = require("http");
+const mysql = require("mysql");
+const db = require("../config/db");
 
-// ------------------------------------------------ DONATIONS ------------------------------------------------
-
-// GET
-
+// Get all donations
 const getDonations = (req, res) => {
-  pool.query(
-    "SELECT donations.Donation_ID, donations.Amount_Donated, donations.Donation_Note, donations.Donation_Date, donations.Donor_ID, users.User_First_Name, users.User_Last_Name FROM donations, users WHERE donations.Donor_ID = users.User_ID",
-    // "SELECT * FROM donations",
-
-    (error, results) => {
+  db.query(
+    `SELECT donations.*, customers.Customer_Fname, customers.Customer_Lname, DATE_FORMAT(Donation_Date, "%M %d, %Y") AS New_Date from donations, customers WHERE donations.Donor_ID = customers.Customer_ID`,
+    (error, result) => {
       if (error) {
-        console.error("Error getting donations:", error);
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ message: "Internal server error" }));
+        res.end(JSON.stringify({ error: error }));
       } else {
-        console.log("Sending donations:", results);
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify(results));
+        res.end(JSON.stringify(result));
       }
     },
   );
 };
 
-// GET
-const getUserDonations = (req, res) => {
-  let body = "";
-
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-
-  req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("GET request body:", data);
-      const { User_ID } = data;
-      pool.query(
-        "SELECT donations.* FROM donations INNER JOIN users ON donations.Donor_ID=users.User_ID WHERE users.User_ID=?",
-        [User_ID],
-        (error, results) => {
-          if (error) {
-            console.error("Error getting user's donations:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
-            console.log("Sending user's donations:", results);
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(JSON.stringify(results));
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
-  });
-};
-
-// POST
+// Add new donation
 const addDonation = (req, res) => {
-  let body = "";
-
+  let data = "";
   req.on("data", (chunk) => {
-    body += chunk.toString();
+    data += chunk;
   });
 
   req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("POST request body:", data);
-      const { Amount_Donated, Donation_Note, Donation_Date, Donor_ID } = data;
-      pool.query(
-        "INSERT INTO donations(Amount_Donated, Donation_Note, Donation_Date, Donor_ID) VALUES (?, ?, ?, ?)",
-        [Amount_Donated, Donation_Note, Donation_Date, Donor_ID],
-        (error, results) => {
-          if (error) {
-            console.error("Error adding donation:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Donation added successfully" }));
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
+    const body = JSON.parse(data);
+    const Amount_Donated = parseInt(body.Amount_Donated);
+    let Donation_Note = body.Donation_Note;
+    const Donor_ID = body.Donor_ID;
+
+    if (Donation_Note === "") {
+      Donation_Note = null;
     }
+
+    db.query(
+      "INSERT INTO donations(Amount_Donated, Donation_Note, Donor_ID) VALUES (?, ?, ?)",
+      [Amount_Donated, Donation_Note, Donor_ID],
+      (error, result) => {
+        if (error) {
+          console.log(error);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Error adding donation!" }));
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ message: "Donation added successfully" }));
+        }
+      },
+    );
   });
 };
 
-// PUT
-const updateDonation = (req, res) => {
-  let body = "";
-
+// Get donations for a customer by ID
+const getCustomerDonations = (req, res) => {
+  let data = "";
   req.on("data", (chunk) => {
-    body += chunk.toString();
+    data += chunk;
   });
 
   req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("Update request body:", data); // Log the request body
-      const { Amount_Donated, Donation_Note, Donation_Date, Donation_ID } =
-        data;
-      pool.query(
-        "UPDATE donations SET Amount_Donated=?, Donation_Note=?, Donation_Date=? WHERE Donation_ID=?",
-        [Amount_Donated, Donation_Note, Donation_Date, Donation_ID],
-        (error, results) => {
-          if (error) {
-            console.error("Error updating donations:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-              JSON.stringify({ message: "Donations updated successfully" }),
-            );
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
+    const body = JSON.parse(data);
+    const Donor_ID = parseInt(body.Donor_ID);
+
+    db.query(
+      `SELECT *, DATE_FORMAT(Donation_Date, "%M %d, %Y") AS New_Donation_Date from donations WHERE Donor_ID = ?`,
+      [Donor_ID],
+      (error, result) => {
+        if (error) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: error }));
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        }
+      },
+    );
   });
 };
 
-// DELETE
-const deleteDonation = (req, res) => {
-  let body = "";
-
+// Get donation by ID
+const getDonationByID = (req, res) => {
+  let data = "";
   req.on("data", (chunk) => {
-    body += chunk.toString();
+    data += chunk;
   });
 
   req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("DELETE request body:", data);
-      const { Donation_ID } = data;
-      pool.query(
-        "DELETE from donations WHERE Donation_ID=?",
-        [Donation_ID],
-        (error, results) => {
-          if (error) {
-            console.error("Error deleting donation:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(
-              JSON.stringify({ message: "Donation deleted successfully" }),
-            );
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
+    const body = JSON.parse(data);
+    const Donation_ID = parseInt(body.Donation_ID);
+
+    db.query(
+      `SELECT *, DATE_FORMAT(Donation_Date, "%M %d, %Y") AS New_Donation_Date from donations WHERE Donation_ID = ?`,
+      [Donation_ID],
+      (error, result) => {
+        if (error) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: error }));
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        }
+      },
+    );
   });
+};
+
+// Get all donations
+const getDonationRevenue = (req, res) => {
+  db.query(
+    `SELECT SUM(Amount_Donated) AS Donation_Sum FROM museum.donations;`,
+    (error, result) => {
+      if (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: error }));
+      } else {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(result));
+      }
+    },
+  );
 };
 
 module.exports = {
-  getDonations,
-  getUserDonations,
   addDonation,
-  updateDonation,
-  deleteDonation,
+  getDonations,
+  getCustomerDonations,
+  getDonationByID,
+  getDonationRevenue,
 };

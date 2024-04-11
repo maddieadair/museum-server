@@ -1,221 +1,151 @@
-const pool = require("../config/db.js");
+const http = require("http");
+const mysql = require("mysql");
+const db = require("../config/db");
 
-// ------------------------------------------------ TICKETS ------------------------------------------------
-
-// GET
+// Get all tickets
 const getTickets = (req, res) => {
-  pool.query("SELECT * from tickets", (error, results) => {
-    if (error) {
-      console.error("Error getting tickets:", error);
-      res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Internal server error" }));
-    } else {
-      console.log("Sending tickets:", results);
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(results));
-    }
+  db.query(
+    `SELECT tickets.*, DATE_FORMAT(Transaction_Date, "%M %d, %Y") AS New_Transaction_Date, DATE_FORMAT(Ticket_Date, "%M %d, %Y") AS New_Ticket_Date, customers.Customer_Fname, customers.Customer_Lname, SUM(tickets.Num_Child_Tickets + tickets.Num_Teen_Tickets + tickets.Num_Adult_Tickets + tickets.Num_Senior_Tickets) AS Ticket_Count from tickets, customers WHERE tickets.Customer_ID = customers.Customer_ID GROUP BY tickets.TicketTransaction_ID
+    `,
+    (error, result) => {
+      if (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: error }));
+      } else {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(result));
+      }
+    },
+  );
+};
+
+// Get tickets for a customer by ID
+const getCustomerTickets = (req, res) => {
+  let data = "";
+  req.on("data", (chunk) => {
+    data += chunk;
+  });
+
+  req.on("end", () => {
+    const body = JSON.parse(data);
+    const Customer_ID = parseInt(body.Customer_ID);
+
+    db.query(
+      `SELECT *, DATE_FORMAT(Transaction_Date, "%M %d, %Y") AS New_Transaction_Date, DATE_FORMAT(Ticket_Date, "%M %d, %Y") AS New_Ticket_Date, SUM(tickets.Num_Child_Tickets + tickets.Num_Teen_Tickets + tickets.Num_Adult_Tickets + tickets.Num_Senior_Tickets) AS Ticket_Count from tickets WHERE tickets.Customer_ID = ? GROUP BY tickets.TicketTransaction_ID`,
+      [Customer_ID],
+      (error, result) => {
+        if (error) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: error }));
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        }
+      },
+    );
   });
 };
 
-// POST
+// Get ticket by ID
+const getTicketByID = (req, res) => {
+  let data = "";
+  req.on("data", (chunk) => {
+    data += chunk;
+  });
+
+  req.on("end", () => {
+    const body = JSON.parse(data);
+    const TicketTransaction_ID = parseInt(body.TicketTransaction_ID);
+
+    db.query(
+      `SELECT *, DATE_FORMAT(Transaction_Date, "%M %d, %Y") AS New_Transaction_Date, DATE_FORMAT(Ticket_Date, "%M %d, %Y") AS New_Ticket_Date, SUM(tickets.Num_Child_Tickets + tickets.Num_Teen_Tickets + tickets.Num_Adult_Tickets + tickets.Num_Senior_Tickets) AS Ticket_Count from tickets WHERE tickets.TicketTransaction_ID = ? GROUP BY tickets.TicketTransaction_ID`,
+      [TicketTransaction_ID],
+      (error, result) => {
+        if (error) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: error }));
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        }
+      },
+    );
+  });
+};
+
+// Add Ticket
 const addTicket = (req, res) => {
-  let body = "";
-
+  let data = "";
   req.on("data", (chunk) => {
-    body += chunk.toString();
+    data += chunk;
   });
 
   req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("POST request body:", data);
-      const {
-        Total_Price,
-        Transaction_Date,
+    const body = JSON.parse(data);
+    const Customer_ID = parseInt(body.Customer_ID);
+    const Total_Bill = parseInt(body.Total_Bill);
+    const Ticket_Date = body.Ticket_Date;
+    const Ticket_Time = body.Ticket_Time;
+    const Num_Child_Tickets = parseInt(body.Num_Child_Tickets);
+    const Num_Teen_Tickets = parseInt(body.Num_Teen_Tickets);
+    const Num_Adult_Tickets = parseInt(body.Num_Adult_Tickets);
+    const Num_Senior_Tickets = parseInt(body.Num_Senior_Tickets);
+    let Exhibition_Name = body.Exhibition_Name;
+
+    if (Exhibition_Name === "") {
+      Exhibition_Name = null;
+    }
+
+    db.query(
+      `INSERT INTO tickets(Customer_ID, Total_Bill, Ticket_Date, Ticket_Time, Num_Child_Tickets, Num_Teen_Tickets, Num_Adult_Tickets, Num_Senior_Tickets, Exhibition_Name) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        Customer_ID,
+        Total_Bill,
         Ticket_Date,
         Ticket_Time,
-        Customer_ID,
         Num_Child_Tickets,
         Num_Teen_Tickets,
         Num_Adult_Tickets,
         Num_Senior_Tickets,
         Exhibition_Name,
-      } = data;
-      pool.query(
-        "INSERT INTO tickets(Total_Price, Transaction_Date, Ticket_Date, Ticket_Time, Customer_ID, Num_Child_Tickets, Num_Teen_Tickets, Num_Adult_Tickets, Num_Senior_Tickets, Exhibition_Name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-          Total_Price,
-          Transaction_Date,
-          Ticket_Date,
-          Ticket_Time,
-          Customer_ID,
-          Num_Child_Tickets,
-          Num_Teen_Tickets,
-          Num_Adult_Tickets,
-          Num_Senior_Tickets,
-          Exhibition_Name,
-        ],
-        (error, results) => {
-          if (error) {
-            console.error("Error adding ticket:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Ticket added successfully" }));
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
-  });
-};
-
-// PUT
-const updateTicket = (req, res) => {
-  let body = "";
-
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-
-  req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("Update request body:", data); // Log the request body
-      const {
-        Total_Price,
-        Transaction_Date,
-        Ticket_Date,
-        Ticket_Time,
-        Customer_ID,
-        Num_Child_Tickets,
-        Num_Teen_Tickets,
-        Num_Adult_Tickets,
-        Num_Senior_Tickets,
-        Exhibition_Name,
-        TicketTransaction_ID,
-      } = data;
-      pool.query(
-        "UPDATE tickets SET Total_Price=?, Transaction_Date=?, Ticket_Date=?, Ticket_Time=?, Customer_ID=?, Num_Child_Tickets=?, Num_Teen_Tickets=?, Num_Adult_Tickets=?, Num_Senior_Tickets=?, Exhibition_Name=? WHERE TicketTransaction_ID=?",
-        [
-          Total_Price,
-          Transaction_Date,
-          Ticket_Date,
-          Ticket_Time,
-          Customer_ID,
-          Num_Child_Tickets,
-          Num_Teen_Tickets,
-          Num_Adult_Tickets,
-          Num_Senior_Tickets,
-          Exhibition_Name,
-          TicketTransaction_ID,
-        ],
-        (error, results) => {
-          if (error) {
-            console.error("Error updating ticket transaction:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
+      ],
+      (error, result) => {
+        if (error) {
+          if (
+            error.sqlMessage === "Tickets for this date and time are sold out."
+          ) {
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(
               JSON.stringify({
-                message: "Ticket transaction updated successfully",
+                message: "Tickets for this date and time are sold out.",
               }),
             );
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
-  });
-};
-
-// DELETE
-const deleteTicket = (req, res) => {
-  let body = "";
-
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-
-  req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("DELETE request body:", data);
-      const { TicketTransaction_ID } = data;
-      pool.query(
-        "DELETE from tickets WHERE TicketTransaction_ID=?",
-        [TicketTransaction_ID],
-        (error, results) => {
-          if (error) {
-            console.error("Error deleting ticket transaction:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
-          } else {
+          } else if (
+            error.sqlMessage === "Requested quantity exceeds current stock"
+          ) {
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(
               JSON.stringify({
-                message: "Ticket transaction deleted successfully",
+                message: "Requested quantity exceeds current stock",
               }),
             );
-          }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
-  });
-};
-
-// GET
-const getUserTickets = (req, res) => {
-  let body = "";
-
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-
-  req.on("end", () => {
-    try {
-      const data = JSON.parse(body);
-      console.log("GET request body:", data);
-      const { User_ID } = data;
-      pool.query(
-        "SELECT tickets.* FROM tickets INNER JOIN users ON tickets.Customer_ID=users.User_ID WHERE users.User_ID=?",
-        [User_ID],
-        (error, results) => {
-          if (error) {
-            console.error("Error getting user's ticket transaction:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ message: "Internal server error" }));
           } else {
-            console.log("Sending user's tickets:", results);
-            res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(JSON.stringify(results));
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: error }));
           }
-        },
-      );
-    } catch (error) {
-      console.error("Error parsing request body:", error);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid request body" }));
-    }
+        } else {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        }
+      },
+    );
   });
 };
 
 module.exports = {
   getTickets,
+  getCustomerTickets,
+  getTicketByID,
   addTicket,
-  updateTicket,
-  deleteTicket,
-  getUserTickets,
+  
 };
