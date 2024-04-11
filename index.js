@@ -28,12 +28,6 @@ const server = http.createServer((req, res) => {
       res.end();
       return;
     }
-
-  if (req.method === "OPTIONS") {
-    res.writeHead(200);
-    res.end();
-    return;
-  }
   // GET Requests
   if (req.method === "GET") {
     if (req.url === "/") {
