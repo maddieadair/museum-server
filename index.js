@@ -16,8 +16,9 @@ const auth = require("./authentication/auth");
 
 const server = http.createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS",
@@ -364,18 +365,18 @@ const server = http.createServer((req, res) => {
 });
 
 // Handle Cors Function To Allow Axios
-// const handleCors = (req, res) => {
-//   res.setHeader("Access-Control-Allow-Origin", "*");
-//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-//   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-//   res.setHeader("Access-Control-Allow-Credentials", true);
+const handleCors = (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Credentials", true);
 
-//   if (req.method === "OPTIONS") {
-//     res.writeHead(200);
-//     res.end();
-//     return;
-//   }
-// };
+  if (req.method === "OPTIONS") {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+};
 
 // Set Up Server To Listen For Requests From Port 3001
 const port = process.env.PORT || 3001;
