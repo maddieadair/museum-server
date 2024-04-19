@@ -13,21 +13,22 @@ const gifts = require("./routes/gifts");
 const gift_log = require("./routes/gift-log");
 const tickets = require("./routes/tickets");
 const auth = require("./authentication/auth");
+const reports = require("./routes/reports");
 
 const server = http.createServer((req, res) => {
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS"
-    );
-  
-    // Handle preflight OPTIONS request
-    if (req.method === "OPTIONS") {
-      res.writeHead(204);
-      res.end();
-      return;
-    }
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS",
+  );
+
+  // Handle preflight OPTIONS request
+  if (req.method === "OPTIONS") {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
   // GET Requests
   if (req.method === "GET") {
     if (req.url === "/") {
@@ -154,12 +155,14 @@ const server = http.createServer((req, res) => {
     } else if (req.url === "/donation-rev") {
       donations.getDonationRevenue(req, res);
     } else if (req.url === "/donation-rev") {
-        tickets.totalExhibitSales(req, res);
-      } else if (req.url === "/exhibit-ticket-sum") {
-        exhibitions.exhibitTicketSum(req, res);
-      } else if (req.url === "/dept-no-mgr") {
-        department.getDeptNoManagers(req, res);
-      }
+      tickets.totalExhibitSales(req, res);
+    } else if (req.url === "/exhibit-ticket-sum") {
+      exhibitions.exhibitTicketSum(req, res);
+    } else if (req.url === "/dept-no-mgr") {
+      department.getDeptNoManagers(req, res);
+    } else if (req.url === "/total-rev") {
+      reports.getTotalRevenue(req, res);
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -306,6 +309,28 @@ const server = http.createServer((req, res) => {
       exhibitions.deptExhibitStats(req, res);
     } else if (req.url === "/dept-exhibit-rev") {
       exhibitions.deptExhibitRev(req, res);
+    } else if (req.url === "/rev-dates") {
+      reports.revenueDates(req, res);
+    } else if (req.url === "/new-artists") {
+      reports.newArtists(req, res);
+    } else if (req.url === "/new-artworks") {
+      reports.newArtworks(req, res);
+    } else if (req.url === "/shop-report") {
+      reports.shopReport(req, res);
+    } else if (req.url === "/shop-count") {
+      reports.shopReportCount(req, res);
+    } else if (req.url === "/dept-new-artists") {
+      reports.deptNewArtists(req, res);
+    } else if (req.url === "/dept-new-art") {
+      reports.deptNewArt(req, res);
+    } else if (req.url === "/dept-ex-report") {
+      reports.deptExReport(req, res);
+    } else if (req.url === "/dept-ex-tickets") {
+      reports.deptExTickets(req, res);
+    } else if (req.url === "/curator-ex-report") {
+      reports.curatorExhibitReport(req, res);
+    } else if (req.url === "/curator-ex-tickets") {
+      reports.curatorTicketReport(req, res);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
