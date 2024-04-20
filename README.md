@@ -29,7 +29,7 @@ This is the backend API for [museum-client](https://github.com/maddieadair/museu
 
 ## Technologies
 - Frontend: `React` and `TailwindCSS`
-- Backend:  `NodeJS`
+- Backend:  `Node.js`
 - Database: `Azure Database for MySQL - Flexible Server`
 - User Authentication: `JWT`
 - Deployment: `Heroku` and `Netlify`
