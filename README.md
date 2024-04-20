@@ -55,7 +55,7 @@ JWT_EXPIRE =`JWT_EXPIRY_TIME`
 ```
 
 3. Start application
-  - As a developer
+  - As a developer (uses nodemon)
 ```
 nodemon index.js
 ```
