@@ -6,10 +6,10 @@ Madeline Adair, Zeel Engineer, Kenny Nguyen, Chase Cotton, Shafnuddin Mohammad
 ## About
 <br />
 <p align="center">
-<img align="center" width="225" alt="Screenshot 2024-04-20 at 15 25 36" src="https://github.com/maddieadair/museum-client/assets/98988491/a838ef75-8427-41c4-9562-23e7463abc50">
-<img align="center" width="225" alt="Screenshot 2024-04-20 at 15 26 23" src="https://github.com/maddieadair/museum-client/assets/98988491/6b3473c7-bf31-441e-8050-a7b8d5f29250">
-<img align="center" width="225" alt="Screenshot 2024-04-20 at 15 26 57" src="https://github.com/maddieadair/museum-client/assets/98988491/0aacf950-5886-4e7c-b568-fde5d1abd5d4">
-<img align="center" width="225" alt="Screenshot 2024-04-20 at 15 27 36" src="https://github.com/maddieadair/museum-client/assets/98988491/005c05c2-38b8-4b4d-9c9e-4a0dbbad0abe">
+<img align="center" width="200" alt="Screenshot 2024-04-20 at 15 25 36" src="https://github.com/maddieadair/museum-client/assets/98988491/a838ef75-8427-41c4-9562-23e7463abc50">
+<img align="center" width="200" alt="Screenshot 2024-04-20 at 15 26 23" src="https://github.com/maddieadair/museum-client/assets/98988491/6b3473c7-bf31-441e-8050-a7b8d5f29250">
+<img align="center" width="200" alt="Screenshot 2024-04-20 at 15 26 57" src="https://github.com/maddieadair/museum-client/assets/98988491/0aacf950-5886-4e7c-b568-fde5d1abd5d4">
+<img align="center" width="200" alt="Screenshot 2024-04-20 at 15 27 36" src="https://github.com/maddieadair/museum-client/assets/98988491/005c05c2-38b8-4b4d-9c9e-4a0dbbad0abe">
 </p>
 
 <br />
