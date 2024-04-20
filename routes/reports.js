@@ -31,8 +31,11 @@ const revenueDates = (req, res) => {
   req.on("end", () => {
     const body = JSON.parse(data);
     const Begin_Date = body.Begin_Date;
-    const End_Date = body.End_Date;
+    let End_Date = body.End_Date;
 
+    if (End_Date === "") {
+        End_Date = new Date().toJSON().slice(0, 10);
+      }
     db.query(
       `select r1 AS donations, r2 AS gifts, r3 AS tickets, r1 + r2 + r3 AS total from
         (select COALESCE(SUM(donations.Amount_Donated),0) as r1 from donations WHERE Donation_Date BETWEEN (?) AND (?)) t1,
@@ -207,6 +210,38 @@ const shopReportCount = (req, res) => {
     );
   });
 };
+
+// Get Shop Report
+const shopReportTotal = (req, res) => {
+    let data = "";
+    req.on("data", (chunk) => {
+      data += chunk;
+    });
+  
+    req.on("end", () => {
+      const body = JSON.parse(data);
+      const Begin_Date = body.Begin_Date;
+      let End_Date = body.End_Date;
+  
+      if (End_Date === "") {
+        End_Date = new Date().toJSON().slice(0, 10);
+      }
+  
+      db.query(
+        `SELECT SUM(total_bill) AS Revenue from gift_log WHERE transaction_date BETWEEN (?) AND (?)`,
+        [Begin_Date, End_Date],
+        (error, result) => {
+          if (error) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: error }));
+          } else {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify(result));
+          }
+        },
+      );
+    });
+  };
 
 // Get new artists added to the museum between certain dates
 const deptNewArtists = (req, res) => {
@@ -431,5 +466,6 @@ module.exports = {
   deptExReport,
   deptExTickets,
   curatorExhibitReport,
-  curatorTicketReport
+  curatorTicketReport,
+  shopReportTotal
 };

@@ -331,7 +331,9 @@ const server = http.createServer((req, res) => {
       reports.curatorExhibitReport(req, res);
     } else if (req.url === "/curator-ex-tickets") {
       reports.curatorTicketReport(req, res);
-    }
+    } else if (req.url === "/shop-report-total") {
+        reports.shopReportTotal(req, res);
+      }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
