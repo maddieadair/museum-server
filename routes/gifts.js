@@ -47,7 +47,7 @@ const getSoldOut = (req, res) => {
 // Get all items that are low in stock
 const getLowStock = (req, res) => {
   db.query(
-    `SELECT * from gifts where gift_currStock <= 5 AND soldout_status != 1 AND gift_numSold != 0;`,
+    `SELECT * from gifts where low_stock_flag = 1 AND soldout_status = 0;`,
     (error, result) => {
       if (error) {
         res.writeHead(500, { "Content-Type": "application/json" });

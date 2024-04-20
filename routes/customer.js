@@ -57,9 +57,10 @@ const updateCustomer = (req, res) => {
     const Customer_Password = body.Customer_Password;
     const Customer_Address = body.Customer_Address;
     const Customer_City = body.Customer_City;
-    const Customer_State = body.Customer_State;
+    let Customer_State = body.Customer_State !== "" ? body.Customer_State : null;
     const Customer_Zipcode = body.Customer_Zipcode;
     const Customer_ID = parseInt(body.Customer_ID);
+
 
     db.query(
       `UPDATE customers SET Customer_Fname = ?, Customer_Lname = ?, Customer_Email = ?, Customer_Password = ?, Customer_Address = ?, Customer_City = ?, Customer_State = ?, Customer_Zipcode = ? WHERE Customer_ID = ?`,

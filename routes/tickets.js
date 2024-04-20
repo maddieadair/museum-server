@@ -96,6 +96,8 @@ const addTicket = (req, res) => {
       Exhibition_Name = null;
     }
 
+    console.log(body)
+
     db.query(
       `INSERT INTO tickets(Customer_ID, Total_Bill, Ticket_Date, Ticket_Time, Num_Child_Tickets, Num_Teen_Tickets, Num_Adult_Tickets, Num_Senior_Tickets, Exhibition_Name) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
@@ -110,7 +112,9 @@ const addTicket = (req, res) => {
         Exhibition_Name,
       ],
       (error, result) => {
+        console.log(result)
         if (error) {
+            console.log(error)
           if (
             error.sqlMessage === "Tickets for this date and time are sold out."
           ) {
@@ -147,5 +151,5 @@ module.exports = {
   getCustomerTickets,
   getTicketByID,
   addTicket,
-  
+
 };
