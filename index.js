@@ -332,7 +332,11 @@ const server = http.createServer((req, res) => {
     } else if (req.url === "/curator-ex-tickets") {
       reports.curatorTicketReport(req, res);
     } else if (req.url === "/shop-report-total") {
-        reports.shopReportTotal(req, res);
+      reports.shopReportTotal(req, res);
+    } else if (req.url === "/curator-ex-sum") {
+      reports.curatorExSum(req, res);
+    } else if (req.url === "/dept-ex-sum") {
+        reports.deptExSum(req, res);
       }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
