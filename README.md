@@ -1,86 +1,65 @@
-# TEAM 1 - Museum Database
-Museum database project for COSC 3380, Dr. Uma Ramamurthy's course.
-
-
-## File Description
-Using the MySQL DBMS, NodeJS for backend, and React for frontend work.
-
-
-
-Installations:
-
-Node:
-(https://nodejs.org/en/download/)
-
-React
-(https://react.dev/learn/installation)
-
-
-
-
-Backend:
-https://github.com/maddieadair/museum-server
-
-Commands to run backend:
-
-Open terminal and run "npm start"
-
-
-
-Frontend:
-https://github.com/maddieadair/museum-client
-
-*Make sure you are running backend first*
-
-
-Commands to run frontend:
-
-Open terminal and run "npm run start"
-
-
-
-
-## User Roles:
-Director
-1. Username: MRoss@mfah.org
-2. Password: M68L04Ross01
-Manager
-1. Username: SYoon@mfah.org
-2. Password: S97!07Yoon28
-Shop Manager
-1. Username: ABoehm@mfah.org
-2. Password: A87!05Boehm08
-Curator
-1. Username: ICarlsen@mfah.org
-2. Password: I90L04Carlsen03
-Customer
-1. Username: mikhailkovalev@mail.com
-2. Password: mikhailkovalevpw
-
-
-## Triggers
-15% discount applied to shopping cart after hitting $100
-
-Alert for when stock levels are low
-
-
-## Data Reports
-1. Exhibition Sales during a certain time period
-2. Financial Reports during a certain time period
-3. Artworks and Artists that were added during a certain time period
-4. Department Reports during a specific time period
-
-
-
+# COSC 3380: Museum Database Server
 
 ## Authors
+Madeline Adair, Zeel Engineer, Kenny Nguyen, Chase Cotton, Shafnuddin Mohammad
 
-Adair, Madeline X
+## About
+<br />
+<p align="center">
+<img align="center" width="225" alt="Screenshot 2024-04-20 at 15 25 36" src="https://github.com/maddieadair/museum-client/assets/98988491/a838ef75-8427-41c4-9562-23e7463abc50">
+<img align="center" width="225" alt="Screenshot 2024-04-20 at 15 26 23" src="https://github.com/maddieadair/museum-client/assets/98988491/6b3473c7-bf31-441e-8050-a7b8d5f29250">
+<img align="center" width="225" alt="Screenshot 2024-04-20 at 15 26 57" src="https://github.com/maddieadair/museum-client/assets/98988491/0aacf950-5886-4e7c-b568-fde5d1abd5d4">
+<img align="center" width="225" alt="Screenshot 2024-04-20 at 15 27 36" src="https://github.com/maddieadair/museum-client/assets/98988491/005c05c2-38b8-4b4d-9c9e-4a0dbbad0abe">
+</p>
 
-Engineer, Zeel
+<br />
 
-Nguyen, Kenny
+This is the backend API for [museum-client](https://github.com/maddieadair/museum-client) using Node.js.
+<br />
+<br />
 
-Cotton, Chase E
+**Miniworld Description:** The Museum of Fine Arts (MFA), Houston needs a database to keep track of their art collections, exhibitions, ticket sales and gift shop revenue. Consider all aspects of what it takes to run a Museum and the data you need to collect, to be able to produce reports regarding the successful functioning of the museum. 
 
-Mohammad, Shafinuddin J
+## Project Requirements
+- User authentication for different user roles
+- Data entry forms – to add new data, modify existing data, and ‘delete’ data.
+- Triggers – At least 2.
+- Data queries – At least 3.
+
+
+## Technologies
+- Frontend: `React` and `TailwindCSS`
+- Backend:  `NodeJS`
+- Database: `Azure Database for MySQL - Flexible Server`
+- User Authentication: `JWT`
+- Deployment: `Heroku` and `Netlify`
+
+
+## Installation/Startup
+
+1. Install Packages
+```
+npm install
+```
+
+2. Environmental variables
+  - create an '.env' file in the source directory
+```sql
+HOST =`MYSQL_HOST`
+PORTNUM =`MYSQOL_PORT`
+SQLUSER =`MYSQL_USER`
+PASSWORD =`MYSQL_PASSWORD`
+DB =`MYSQL_DB`
+JWT_SECRET =`JWT_SECRET_KEY`
+JWT_EXPIRE =`JWT_EXPIRY_TIME`
+```
+
+3. Start application
+  - As a developer
+```
+nodemon index.js
+```
+  - Production
+```
+npm start
+```
